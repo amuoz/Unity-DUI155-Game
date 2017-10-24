@@ -1,9 +1,9 @@
-DUI155/Library/
-DUI155/Temp/
-DUI155/Obj/
-DUI155/Build/
-DUI155/Builds/
-DUI155/Assets/AssetStoreTools*
+/[Ll]ibrary/
+/[Tt]emp/
+/[Ob]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/Assets/AssetStoreTools*
 
 # Visual Studio 2015 cache directory
 /.vs/
