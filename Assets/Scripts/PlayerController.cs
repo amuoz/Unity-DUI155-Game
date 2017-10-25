@@ -59,9 +59,17 @@ public class PlayerController : MonoBehaviour {
      */
     private void AnimationHandler(float hAxis, float vAxis)
     {
-        if (hAxis == 0)
+        if (hAxis == 0 && vAxis == 0)
         {
             anim.SetInteger("State", 0);
+        }
+        else if (vAxis > 0)
+        {
+            anim.SetInteger("State", 3);
+        }
+        else if (vAxis < 0)
+        {
+            anim.SetInteger("State", 4);
         }
         else if (hAxis < 0)
         {
