@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class MonsterController : MonoBehaviour {
 
@@ -14,6 +15,9 @@ public class MonsterController : MonoBehaviour {
     public MonsterController next;
 
     private float movingDirection = 1f;
+
+    public float waitToReload;
+    private bool reloading;
 
 	// Use this for initialization
 	void Start () {
@@ -30,23 +34,39 @@ public class MonsterController : MonoBehaviour {
         {
             MoveDown();
         }
-    }
 
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if(collision.tag == "Box")
+        if (reloading)
         {
-            MoveDown();
-        } else if (collision.tag == "Bullet")
-        {
-            Destroy(collision.gameObject);
-            if(OnKill != null)
+            waitToReload -= Time.deltaTime;
+            if (waitToReload < 0)
             {
-                OnKill(this);
+                SceneManager.LoadScene("Game");
             }
         }
     }
 
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.tag == "Box")
+        {
+            MoveDown();
+        }
+        else if (collision.tag == "Bullet")
+        {
+            Destroy(collision.gameObject);
+            if (OnKill != null)
+            {
+                OnKill(this);
+            }
+        }
+        else if (collision.tag == "Player")
+        {
+            //Destroy(collision.gameObject);
+            collision.gameObject.SetActive(false);
+            reloading = true;
+        }
+    }
+    
     void MoveDown()
     {
         // cuando llega al limite cambiamos direccion

@@ -7,6 +7,8 @@ TagManager:
   - Box
   - Bullet
   - Monster
+  - Porra
+  - Enemy
   layers:
   - Default
   - TransparentFX
@@ -44,6 +46,12 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: Game
+  - name: Ground
     uniqueID: 2721828837
+    locked: 0
+  - name: Player
+    uniqueID: 3465387675
+    locked: 0
+  - name: UI
+    uniqueID: 1090826955
     locked: 0

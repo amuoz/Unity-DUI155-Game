@@ -7,6 +7,11 @@ public class PlayerController : MonoBehaviour {
 
     public float speed = 1.5f;
     public float horizontalLimit = 2.8f;
+    public float verticalLimit = 1.8f;
+
+    // health
+    public int maxHealth;
+    private int currentHealth;
 
     // bullet properties
     public GameObject bulletPrefab;
@@ -16,74 +21,127 @@ public class PlayerController : MonoBehaviour {
     private float shootingTimer;
     private float bulletTimer = 5f;
 
+    // melee attack
+    private bool attacking;
+    public float attackTime;
+    private float attackTimeCounter;
+
     //Animator component
-    Animator anim;
-    //Rigidbody component
-    Rigidbody2D rb;
+    private Animator anim;
+    private Rigidbody2D myRigidBody;
+
+    private bool playerMoving;
+    private Vector2 lastMove;
 
     // Use this for initialization
     void Start () {
         anim = GetComponent<Animator>();
-        rb = GetComponent<Rigidbody2D>();
+        myRigidBody = GetComponent<Rigidbody2D>();
+
+        currentHealth = maxHealth;
     }
 	
 	// Update is called once per frame
 	void FixedUpdate () {
         WalkHandler();
+        MeleeHandler();
         ShootHandler();
+        HealthHandler();
     }
 
     // Manejador de movimiento
     private void WalkHandler()
     {
-        // Input on X (Horizontal)
-        float hAxis = Input.GetAxis("Horizontal");
+        playerMoving = false;
 
-        // Input on Y (Vertical)
-        float vAxis = Input.GetAxis("Vertical");
+        Vector2 inputDirection = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 
-        AnimationHandler(hAxis, vAxis);
+        if (!attacking)
+        {
 
-        // Actualizar la velocidad del personaje
-        UpdateSpeed(hAxis, vAxis);
-        
+            if (inputDirection.x != 0f)
+            {
+                playerMoving = true;
+                lastMove = new Vector2(inputDirection.x, 0f);
+                //inputDirection.x = CheckCollitionHorizontal(inputDirection) ? 0f : inputDirection.x;
+            }
+
+            if (inputDirection.y != 0f)
+            {
+                playerMoving = true;
+                lastMove = new Vector2(0f, inputDirection.y);
+                //inputDirection.y = CheckCollitionVertical(inputDirection) ? 0f : inputDirection.y;
+            }
+
+            if (playerMoving)
+            {
+                transform.Translate(inputDirection * speed * Time.deltaTime);
+            }
+        }
+       
+        AnimationHandler(inputDirection);
+
         // Evitar salirnos de escena
-        CheckBoundaries();
+        CheckBoundaries();        
     }
 
-    /* 
-     * Animation Control
-     * hAxis == 0 Iddle
-     * hAxis > 0 Right
-     * hAxis < 0 Left
-     */
-    private void AnimationHandler(float hAxis, float vAxis)
+    private bool CheckCollitionHorizontal(Vector2 inputDirection)
     {
-        if (hAxis == 0 && vAxis == 0)
+        if (inputDirection.x != 0f)
         {
-            anim.SetInteger("State", 0);
+            Vector2 size = new Vector2(GetComponent<BoxCollider2D>().bounds.extents.x + 0.001f, GetComponent<BoxCollider2D>().bounds.extents.y + 0.001f);
+
+            Vector2 oldPos = new Vector2(transform.position.x, transform.position.y);
+
+            // calcular la colision horizontal
+            bool isGoingRight = inputDirection.x > 0;
+            Vector2 hRayDir = isGoingRight ? Vector2.right : Vector2.left;
+            Vector2 hCorner1 = oldPos + new Vector2(hRayDir.x * size.x, (size.y - 0.02f));
+            Vector2 hCorner2 = oldPos + new Vector2(hRayDir.x * size.x, -(size.y - 0.02f));
+            bool col1 = Physics2D.Raycast(hCorner1, hRayDir.x * Vector2.right, 0.02f);
+            bool col2 = Physics2D.Raycast(hCorner2, hRayDir.x * Vector2.right, 0.02f);
+
+            Debug.DrawRay(hCorner1, hRayDir.x * Vector2.right * 0.1f, Color.red, 0.01f);
+            Debug.DrawRay(hCorner2, hRayDir.x * Vector2.right * 0.1f, Color.red, 0.01f);
+
+            return col1 || col2;
         }
-        else if (vAxis > 0)
-        {
-            anim.SetInteger("State", 3);
-        }
-        else if (vAxis < 0)
-        {
-            anim.SetInteger("State", 4);
-        }
-        else if (hAxis < 0)
-        {
-            anim.SetInteger("State", 1);
-        }
-        else if (hAxis > 0)
-        {
-            anim.SetInteger("State", 2);
-        }
+        return false;
     }
 
-    private void UpdateSpeed(float hAxis, float vAxis)
+    private bool CheckCollitionVertical(Vector2 inputDirection)
     {
-        rb.velocity = new Vector2(hAxis * speed, vAxis * speed);
+        if (inputDirection.y != 0f)
+        {
+            Vector2 size = new Vector2(GetComponent<BoxCollider2D>().bounds.extents.x + 0.001f, GetComponent<BoxCollider2D>().bounds.extents.y + 0.001f);
+
+            Vector2 oldPos = new Vector2(transform.position.x, transform.position.y);
+
+            // calcular la colision vertical
+            bool isGoingUp = inputDirection.y > 0;
+            Vector2 vRayDir = isGoingUp ? Vector2.up : Vector2.down;
+            Vector2 vCorner1 = oldPos + new Vector2((size.x - 0.02f), vRayDir.y * size.y);
+            Vector2 vCorner2 = oldPos + new Vector2(-(size.x - 0.02f), vRayDir.y * size.y);
+
+            bool col3 = Physics2D.Raycast(vCorner1, vRayDir.y * Vector2.up, 0.02f);
+            bool col4 = Physics2D.Raycast(vCorner2, vRayDir.y * Vector2.up, 0.02f);
+
+            Debug.DrawRay(vCorner1, vRayDir.y * Vector2.up * 0.1f, Color.red, 0.01f);
+            Debug.DrawRay(vCorner2, vRayDir.y * Vector2.up * 0.1f, Color.red, 0.01f);
+
+            return col3 || col4;
+        }
+        return false;
+    }
+
+    private void AnimationHandler(Vector2 inputDirection)
+    {
+        anim.SetFloat("MoveX", inputDirection.x);
+        anim.SetFloat("MoveY", inputDirection.y);
+        anim.SetBool("PlayerMoving", playerMoving);
+        anim.SetFloat("LastMoveX", lastMove.x);
+        anim.SetFloat("LastMoveY", lastMove.y);
+        anim.SetBool("Attacking", attacking);
     }
 
     // Comprueba si hemos llegado al límite de la escena y reposiciona al personaje
@@ -97,35 +155,84 @@ public class PlayerController : MonoBehaviour {
         {
             transform.position = new Vector2(-horizontalLimit, transform.position.y);
         }
+
+        if (transform.position.y > verticalLimit)
+        {
+            transform.position = new Vector2(transform.position.x, verticalLimit);
+        }
+        else if (transform.position.y < -verticalLimit)
+        {
+            transform.position = new Vector2(transform.position.x, -verticalLimit);
+        }
+
     }
 
     // Manejador de disparo
     private void ShootHandler()
     {
+        // Input on X (Horizontal)
+        float hAxis = Input.GetAxis("FireHorizontal");
+
+        // Input on Y (Vertical)
+        float vAxis = Input.GetAxis("FireVertical");
+
         // decrementar el timer acorde a deltaTime
         shootingTimer -= Time.deltaTime;
-        
+
         // comprobamos primero si podemos disparar
         if (shootingTimer <= 0)
         {
-            if (Input.GetAxis("Fire1") == 1f)
+            if (hAxis != 0f || vAxis != 0f)
             {
                 shootingTimer = shootingCooldown;
 
                 GameObject bulletInstance = Instantiate(bulletPrefab);
                 bulletInstance.transform.SetParent(transform.parent);
                 bulletInstance.transform.position = transform.position;
-                bulletInstance.GetComponent<Rigidbody2D>().velocity = new Vector2(0, bulletSpeed);
+
+                bulletInstance.GetComponent<Rigidbody2D>().velocity = new Vector2(hAxis * bulletSpeed, vAxis * bulletSpeed);
+
                 Destroy(bulletInstance, bulletTimer);
             }
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    public void HealthHandler()
     {
-        if(collision.tag == "Monster")
+        if(currentHealth <= 0)
         {
-            Destroy(gameObject);
+            gameObject.SetActive(false);
+        }
+    }
+
+    public void HurtPlayer(int damage)
+    {
+        currentHealth -= damage;
+    }
+
+    public void SetMaxHealth()
+    {
+        currentHealth = maxHealth;
+    }
+
+    private void MeleeHandler()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            attackTimeCounter = attackTime;
+            attacking = true;
+            myRigidBody.velocity = Vector2.zero;
+        }
+
+        if(attackTimeCounter >= 0)
+        {
+            attackTimeCounter -= Time.deltaTime;
+        }
+
+        if(attackTimeCounter <= 0)
+        {
+            attacking = false;
+            anim.SetBool("Attacking", attacking);
         }
     }
 
