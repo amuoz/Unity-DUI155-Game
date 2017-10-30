@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour {
 
     // health
     public int maxHealth;
-    private int currentHealth;
+    public int currentHealth;
 
     // bullet properties
     public GameObject bulletPrefab;
