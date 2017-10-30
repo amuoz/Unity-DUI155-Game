@@ -19,7 +19,7 @@ public class EnemyController : MonoBehaviour {
     private Vector2 moveDirection;
 
     public float waitToReload;
-    private bool reloading;
+    //private bool reloading;
 
     // Use this for initialization
     void Start () {
@@ -62,6 +62,7 @@ public class EnemyController : MonoBehaviour {
             }
         }
 
+        /*
         if (reloading)
         {
             waitToReload -= Time.deltaTime;
@@ -70,6 +71,7 @@ public class EnemyController : MonoBehaviour {
                 SceneManager.LoadScene("Game");
             }
         }
+        */
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

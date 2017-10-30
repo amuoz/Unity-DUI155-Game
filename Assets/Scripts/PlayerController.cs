@@ -5,7 +5,11 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
 
+    // move speed
     public float speed = 1.5f;
+    private float currentMoveSpeed;
+    public float diagonalMoveModifier;
+
     public float horizontalLimit = 2.8f;
     public float verticalLimit = 1.8f;
 
@@ -33,12 +37,21 @@ public class PlayerController : MonoBehaviour {
     private bool playerMoving;
     private Vector2 lastMove;
 
+    private SFXController sfx;
+
     // Use this for initialization
     void Start () {
         anim = GetComponent<Animator>();
         myRigidBody = GetComponent<Rigidbody2D>();
+        sfx = FindObjectOfType<SFXController>();
 
         currentHealth = maxHealth;
+
+        currentMoveSpeed = speed;
+
+        // fix initial position of weapon
+        lastMove = Vector2.down;
+
     }
 	
 	// Update is called once per frame
@@ -73,9 +86,13 @@ public class PlayerController : MonoBehaviour {
                 //inputDirection.y = CheckCollitionVertical(inputDirection) ? 0f : inputDirection.y;
             }
 
+
+            // diagonal movement fix
+            currentMoveSpeed = (inputDirection.x != 0f && inputDirection.y != 0f) ? (speed / diagonalMoveModifier) : speed;
+
             if (playerMoving)
             {
-                transform.Translate(inputDirection * speed * Time.deltaTime);
+                transform.Translate(inputDirection * currentMoveSpeed * Time.deltaTime);
             }
         }
        
@@ -201,13 +218,18 @@ public class PlayerController : MonoBehaviour {
     {
         if(currentHealth <= 0)
         {
-            gameObject.SetActive(false);
+            sfx.playerDead.Play();
+            gameObject.SetActive(false);     
         }
     }
 
     public void HurtPlayer(int damage)
     {
         currentHealth -= damage;
+
+        // añadir efecto de flash
+
+        sfx.playerHurt.Play();
     }
 
     public void SetMaxHealth()
@@ -222,6 +244,8 @@ public class PlayerController : MonoBehaviour {
             attackTimeCounter = attackTime;
             attacking = true;
             myRigidBody.velocity = Vector2.zero;
+
+            sfx.playerAttack.Play();
         }
 
         if(attackTimeCounter >= 0)
