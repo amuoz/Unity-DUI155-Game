@@ -8,10 +8,6 @@ public class PlayerController : MonoBehaviour {
     // move speed
     public float speed = 1.5f;
     private float currentMoveSpeed;
-    public float diagonalMoveModifier;
-
-    public float horizontalLimit = 2.8f;
-    public float verticalLimit = 1.8f;
 
     // health
     public int maxHealth;
@@ -35,7 +31,6 @@ public class PlayerController : MonoBehaviour {
     private Rigidbody2D myRigidBody;
 
     private bool playerMoving;
-    private Vector2 lastMove;
 
     private SFXController sfx;
 
@@ -48,10 +43,6 @@ public class PlayerController : MonoBehaviour {
         currentHealth = maxHealth;
 
         currentMoveSpeed = speed;
-
-        // fix initial position of weapon
-        lastMove = Vector2.down;
-
     }
 	
 	// Update is called once per frame
@@ -74,116 +65,36 @@ public class PlayerController : MonoBehaviour {
             //This will clamp how far up/down/left/right we can go in LOCAL space
             transform.position = new Vector2(Mathf.Clamp(transform.position.x, -29, 29), Mathf.Clamp(transform.position.y, -14, -5));
 
-            if (inputDirection.x != 0f)
+            if (inputDirection.x != 0f || inputDirection.y != 0f)
             {
                 playerMoving = true;
-                lastMove = new Vector2(inputDirection.x, 0f);
-                //inputDirection.x = CheckCollitionHorizontal(inputDirection) ? 0f : inputDirection.x;
+
             }
 
-            if (inputDirection.y != 0f)
+            //Checks to see which way our player is going and flips their facing direction
+            if (inputDirection.x > 0)
             {
-                playerMoving = true;
-                lastMove = new Vector2(0f, inputDirection.y);
-                //inputDirection.y = CheckCollitionVertical(inputDirection) ? 0f : inputDirection.y;
+                transform.rotation = Quaternion.Euler(new Vector3(0, 0, 0));
             }
-
-
-            // diagonal movement fix
-            currentMoveSpeed = (inputDirection.x != 0f && inputDirection.y != 0f) ? (speed / diagonalMoveModifier) : speed;
+            else if (inputDirection.x < 0)
+            {
+                transform.rotation = Quaternion.Euler(new Vector3(0, 180, 0));
+            }
 
             if (playerMoving)
             {
-                transform.Translate(inputDirection * currentMoveSpeed * Time.deltaTime);
+                Vector2 movimiento = new Vector2(Mathf.Abs(inputDirection.x), inputDirection.y);
+                transform.Translate(movimiento * currentMoveSpeed * Time.deltaTime);
             }
         }
        
-        AnimationHandler(inputDirection);
-
-        // Evitar salirnos de escena
-        //CheckBoundaries();        
-    }
-
-    private bool CheckCollitionHorizontal(Vector2 inputDirection)
-    {
-        if (inputDirection.x != 0f)
-        {
-            Vector2 size = new Vector2(GetComponent<BoxCollider2D>().bounds.extents.x + 0.001f, GetComponent<BoxCollider2D>().bounds.extents.y + 0.001f);
-
-            Vector2 oldPos = new Vector2(transform.position.x, transform.position.y);
-
-            // calcular la colision horizontal
-            bool isGoingRight = inputDirection.x > 0;
-            Vector2 hRayDir = isGoingRight ? Vector2.right : Vector2.left;
-            Vector2 hCorner1 = oldPos + new Vector2(hRayDir.x * size.x, (size.y - 0.02f));
-            Vector2 hCorner2 = oldPos + new Vector2(hRayDir.x * size.x, -(size.y - 0.02f));
-            bool col1 = Physics2D.Raycast(hCorner1, hRayDir.x * Vector2.right, 0.02f);
-            bool col2 = Physics2D.Raycast(hCorner2, hRayDir.x * Vector2.right, 0.02f);
-
-            Debug.DrawRay(hCorner1, hRayDir.x * Vector2.right * 0.1f, Color.red, 0.01f);
-            Debug.DrawRay(hCorner2, hRayDir.x * Vector2.right * 0.1f, Color.red, 0.01f);
-
-            return col1 || col2;
-        }
-        return false;
-    }
-
-    private bool CheckCollitionVertical(Vector2 inputDirection)
-    {
-        if (inputDirection.y != 0f)
-        {
-            Vector2 size = new Vector2(GetComponent<BoxCollider2D>().bounds.extents.x + 0.001f, GetComponent<BoxCollider2D>().bounds.extents.y + 0.001f);
-
-            Vector2 oldPos = new Vector2(transform.position.x, transform.position.y);
-
-            // calcular la colision vertical
-            bool isGoingUp = inputDirection.y > 0;
-            Vector2 vRayDir = isGoingUp ? Vector2.up : Vector2.down;
-            Vector2 vCorner1 = oldPos + new Vector2((size.x - 0.02f), vRayDir.y * size.y);
-            Vector2 vCorner2 = oldPos + new Vector2(-(size.x - 0.02f), vRayDir.y * size.y);
-
-            bool col3 = Physics2D.Raycast(vCorner1, vRayDir.y * Vector2.up, 0.02f);
-            bool col4 = Physics2D.Raycast(vCorner2, vRayDir.y * Vector2.up, 0.02f);
-
-            Debug.DrawRay(vCorner1, vRayDir.y * Vector2.up * 0.1f, Color.red, 0.01f);
-            Debug.DrawRay(vCorner2, vRayDir.y * Vector2.up * 0.1f, Color.red, 0.01f);
-
-            return col3 || col4;
-        }
-        return false;
+        AnimationHandler(inputDirection);   
     }
 
     private void AnimationHandler(Vector2 inputDirection)
     {
-        anim.SetFloat("MoveX", inputDirection.x);
-        anim.SetFloat("MoveY", inputDirection.y);
         anim.SetBool("PlayerMoving", playerMoving);
-        anim.SetFloat("LastMoveX", lastMove.x);
-        anim.SetFloat("LastMoveY", lastMove.y);
         anim.SetBool("Attacking", attacking);
-    }
-
-    // Comprueba si hemos llegado al límite de la escena y reposiciona al personaje
-    private void CheckBoundaries()
-    {
-        if (transform.position.x > horizontalLimit)
-        {
-            transform.position = new Vector2(horizontalLimit, transform.position.y);
-        }
-        else if (transform.position.x < -horizontalLimit)
-        {
-            transform.position = new Vector2(-horizontalLimit, transform.position.y);
-        }
-
-        if (transform.position.y > verticalLimit)
-        {
-            transform.position = new Vector2(transform.position.x, verticalLimit);
-        }
-        else if (transform.position.y < -verticalLimit)
-        {
-            transform.position = new Vector2(transform.position.x, -verticalLimit);
-        }
-
     }
 
     // Manejador de disparo
