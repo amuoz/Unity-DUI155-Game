@@ -1246,11 +1246,6 @@ Prefab:
       propertyPath: m_Name
       value: Enemy (2)
       objectReference: {fileID: 0}
-    - target: {fileID: 114723331184154274, guid: 7169463680cddc64b83806fb0dacebcb,
-        type: 2}
-      propertyPath: moveSpeed
-      value: 15
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 7169463680cddc64b83806fb0dacebcb, type: 2}
   m_IsPrefabParent: 0
