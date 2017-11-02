@@ -16,7 +16,7 @@ public class MusicController : MonoBehaviour {
         if (!MusicControllerExists)
         {
             MusicControllerExists = true;
-            DontDestroyOnLoad(transform.gameObject);
+            DontDestroyOnLoad(gameObject);
         }
         else
         {

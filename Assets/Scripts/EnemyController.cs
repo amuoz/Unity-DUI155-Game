@@ -37,6 +37,9 @@ public class EnemyController : MonoBehaviour {
     {
         if (moving)
         {
+            //This will clamp how far up/down/left/right we can go in LOCAL space
+            transform.position = new Vector2(Mathf.Clamp(transform.position.x, -29, 29), Mathf.Clamp(transform.position.y, -15, -6));
+
             timeToMoveCounter -= Time.deltaTime;
             myRigidBody.velocity = moveDirection;
 

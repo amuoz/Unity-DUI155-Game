@@ -15,7 +15,7 @@ public class SFXController : MonoBehaviour {
         if (!SFXControllerExists)
         {
             SFXControllerExists = true;
-            DontDestroyOnLoad(transform.gameObject);
+            DontDestroyOnLoad(gameObject);
         }
         else
         {

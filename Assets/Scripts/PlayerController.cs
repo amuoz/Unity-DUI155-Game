@@ -71,6 +71,8 @@ public class PlayerController : MonoBehaviour {
 
         if (!attacking)
         {
+            //This will clamp how far up/down/left/right we can go in LOCAL space
+            transform.position = new Vector2(Mathf.Clamp(transform.position.x, -29, 29), Mathf.Clamp(transform.position.y, -14, -5));
 
             if (inputDirection.x != 0f)
             {
@@ -99,7 +101,7 @@ public class PlayerController : MonoBehaviour {
         AnimationHandler(inputDirection);
 
         // Evitar salirnos de escena
-        CheckBoundaries();        
+        //CheckBoundaries();        
     }
 
     private bool CheckCollitionHorizontal(Vector2 inputDirection)
