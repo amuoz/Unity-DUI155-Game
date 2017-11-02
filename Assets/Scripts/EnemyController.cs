@@ -19,14 +19,10 @@ public class EnemyController : MonoBehaviour {
     private Vector2 moveDirection;
 
     public float waitToReload;
-    //private bool reloading;
 
     // Use this for initialization
     void Start () {
         myRigidBody = GetComponent<Rigidbody2D>();
-
-        //timeBetweenMoveCounter = timeBetweenMove;
-        //timeToMoveCounter = timeToMove;
 
         timeBetweenMoveCounter = Random.Range(timeBetweenMove * 0.75f, timeBetweenMove * 1.25f);
         timeToMoveCounter = Random.Range(timeToMove * 0.75f, timeToMove * 1.25f);
@@ -65,37 +61,6 @@ public class EnemyController : MonoBehaviour {
             }
         }
 
-        /*
-        if (reloading)
-        {
-            waitToReload -= Time.deltaTime;
-            if(waitToReload < 0)
-            {
-                SceneManager.LoadScene("Game");
-            }
-        }
-        */
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision.tag == "Bullet")
-        {
-            Destroy(collision.gameObject);
-            Destroy(gameObject);
-        }
-    }
-
-    private void OnCollisionEnter2D(Collision2D other)
-    {
-        /*
-        if(other.gameObject.tag == "Player")
-        {
-            //Destroy(other.gameObject);
-            other.gameObject.SetActive(false);
-            reloading = true;
-        }
-        */
     }
 
 }

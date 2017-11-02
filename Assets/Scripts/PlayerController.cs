@@ -6,7 +6,8 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour {
 
     // move speed
-    public float speed = 1.5f;
+    public float speed;
+    public float currentSpeed;
 
     // health
     public int maxHealth;
@@ -32,6 +33,7 @@ public class PlayerController : MonoBehaviour {
         sfx = FindObjectOfType<SFXController>();
 
         currentHealth = maxHealth;
+        currentSpeed = speed;
     }
 	
 	// Update is called once per frame
@@ -72,7 +74,7 @@ public class PlayerController : MonoBehaviour {
             if (playerMoving)
             {
                 Vector2 movimiento = new Vector2(Mathf.Abs(inputDirection.x), inputDirection.y);
-                transform.Translate(movimiento * speed * Time.deltaTime);
+                transform.Translate(movimiento * currentSpeed * Time.deltaTime);
             }
         }
        
