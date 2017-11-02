@@ -7,19 +7,10 @@ public class PlayerController : MonoBehaviour {
 
     // move speed
     public float speed = 1.5f;
-    private float currentMoveSpeed;
 
     // health
     public int maxHealth;
     public int currentHealth;
-
-    // bullet properties
-    public GameObject bulletPrefab;
-    public float bulletSpeed;
-    public float shootingCooldown;
-
-    private float shootingTimer;
-    private float bulletTimer = 5f;
 
     // melee attack
     private bool attacking;
@@ -41,15 +32,12 @@ public class PlayerController : MonoBehaviour {
         sfx = FindObjectOfType<SFXController>();
 
         currentHealth = maxHealth;
-
-        currentMoveSpeed = speed;
     }
 	
 	// Update is called once per frame
 	void FixedUpdate () {
         WalkHandler();
         MeleeHandler();
-        ShootHandler();
         HealthHandler();
     }
 
@@ -84,7 +72,7 @@ public class PlayerController : MonoBehaviour {
             if (playerMoving)
             {
                 Vector2 movimiento = new Vector2(Mathf.Abs(inputDirection.x), inputDirection.y);
-                transform.Translate(movimiento * currentMoveSpeed * Time.deltaTime);
+                transform.Translate(movimiento * speed * Time.deltaTime);
             }
         }
        
@@ -95,36 +83,6 @@ public class PlayerController : MonoBehaviour {
     {
         anim.SetBool("PlayerMoving", playerMoving);
         anim.SetBool("Attacking", attacking);
-    }
-
-    // Manejador de disparo
-    private void ShootHandler()
-    {
-        // Input on X (Horizontal)
-        float hAxis = Input.GetAxis("FireHorizontal");
-
-        // Input on Y (Vertical)
-        float vAxis = Input.GetAxis("FireVertical");
-
-        // decrementar el timer acorde a deltaTime
-        shootingTimer -= Time.deltaTime;
-
-        // comprobamos primero si podemos disparar
-        if (shootingTimer <= 0)
-        {
-            if (hAxis != 0f || vAxis != 0f)
-            {
-                shootingTimer = shootingCooldown;
-
-                GameObject bulletInstance = Instantiate(bulletPrefab);
-                bulletInstance.transform.SetParent(transform.parent);
-                bulletInstance.transform.position = transform.position;
-
-                bulletInstance.GetComponent<Rigidbody2D>().velocity = new Vector2(hAxis * bulletSpeed, vAxis * bulletSpeed);
-
-                Destroy(bulletInstance, bulletTimer);
-            }
-        }
     }
 
     public void HealthHandler()
