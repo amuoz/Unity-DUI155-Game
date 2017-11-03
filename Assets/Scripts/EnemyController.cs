@@ -5,7 +5,9 @@ using UnityEngine.SceneManagement;
 
 public class EnemyController : MonoBehaviour {
 
-    public float moveSpeed;
+    public float speed;
+    // modificador de velocidad
+    private float speedMod;
 
     private Rigidbody2D myRigidBody;
 
@@ -17,12 +19,21 @@ public class EnemyController : MonoBehaviour {
     private bool moving;
 
     private Vector2 moveDirection;
+    private SpriteRenderer sprite;
 
     public float waitToReload;
+
+    // check got hit
+    private bool hit;
+
+    // knockback
+    private bool onGround;
+    private float groundY;
 
     // Use this for initialization
     void Start () {
         myRigidBody = GetComponent<Rigidbody2D>();
+        sprite = GetComponent<SpriteRenderer>();
 
         timeBetweenMoveCounter = Random.Range(timeBetweenMove * 0.75f, timeBetweenMove * 1.25f);
         timeToMoveCounter = Random.Range(timeToMove * 0.75f, timeToMove * 1.25f);
@@ -38,6 +49,8 @@ public class EnemyController : MonoBehaviour {
 
             timeToMoveCounter -= Time.deltaTime;
             myRigidBody.velocity = moveDirection;
+            // depth of the sprite segun valor de Y
+            sprite.sortingOrder = -1* (int) transform.position.y;
 
             if (timeToMoveCounter < 0f)
             {
@@ -57,7 +70,7 @@ public class EnemyController : MonoBehaviour {
                 //timeToMoveCounter = timeToMove;
                 timeToMoveCounter = Random.Range(timeToMove * 0.75f, timeToMove * 1.25f);
 
-                moveDirection = new Vector2(Random.Range(-0.5f, 0.5f) * moveSpeed, Random.Range(-0.5f, 0.5f) * moveSpeed);
+                moveDirection = new Vector2(Random.Range(-0.5f, 0.5f) * speed, Random.Range(-0.5f, 0.5f) * speed);
             }
         }
 

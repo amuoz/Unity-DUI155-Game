@@ -29,6 +29,8 @@ public class HurtEnemyController : MonoBehaviour {
             Instantiate(damageBurst, hitPoint.position, hitPoint.rotation);
             var clone = (GameObject) Instantiate(damageNumber, hitPoint.position, Quaternion.Euler(Vector3.zero));
             clone.GetComponent<FloatingNumbersController>().damageNumber = damageToGive;
+
+            other.gameObject.GetComponent<Animator>().SetTrigger("enemyHit");
         }
     }
 

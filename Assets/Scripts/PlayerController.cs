@@ -2,10 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour {
 
-    // move speed
     public float speed;
     public float currentSpeed;
 
@@ -18,12 +18,19 @@ public class PlayerController : MonoBehaviour {
     public float attackTime;
     private float attackTimeCounter;
 
-    //Animator component
-    private Animator anim;
-    private Rigidbody2D myRigidBody;
+    // we got hit
+    private bool hit;
+
+    // knockback
+    private bool onGround;
+    private float groundY;
 
     private bool playerMoving;
 
+    //Animator component
+    private Animator anim;
+    private Rigidbody2D myRigidBody;
+    private SpriteRenderer sprite;
     private SFXController sfx;
 
     // Use this for initialization
@@ -31,16 +38,19 @@ public class PlayerController : MonoBehaviour {
         anim = GetComponent<Animator>();
         myRigidBody = GetComponent<Rigidbody2D>();
         sfx = FindObjectOfType<SFXController>();
+        sprite = GetComponent<SpriteRenderer>();
 
         currentHealth = maxHealth;
         currentSpeed = speed;
+
+        onGround = true;
     }
 	
 	// Update is called once per frame
 	void FixedUpdate () {
         WalkHandler();
         MeleeHandler();
-        HealthHandler();
+        AnimationHandler();
     }
 
     // Manejador de movimiento
@@ -50,15 +60,15 @@ public class PlayerController : MonoBehaviour {
 
         Vector2 inputDirection = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 
-        if (!attacking)
+        if (!attacking && !hit)
         {
+
             //This will clamp how far up/down/left/right we can go in LOCAL space
             transform.position = new Vector2(Mathf.Clamp(transform.position.x, -29, 29), Mathf.Clamp(transform.position.y, -14, -5));
 
             if (inputDirection.x != 0f || inputDirection.y != 0f)
             {
                 playerMoving = true;
-
             }
 
             //Checks to see which way our player is going and flips their facing direction
@@ -71,43 +81,22 @@ public class PlayerController : MonoBehaviour {
                 transform.rotation = Quaternion.Euler(new Vector3(0, 180, 0));
             }
 
+            //If the player is on the ground move them with XSpeed and YSpeed, otherwise ignore YSpeed
+            if (!onGround)
+            {
+                inputDirection.y = 0f;
+            }
+
             if (playerMoving)
             {
+                // al hacer flip sobre la transform original del player nos quedamos con el valor absoluto de X
                 Vector2 movimiento = new Vector2(Mathf.Abs(inputDirection.x), inputDirection.y);
                 transform.Translate(movimiento * currentSpeed * Time.deltaTime);
+                // depth of the sprite segun valor de Y
+                sprite.sortingOrder = -1* (int) transform.position.y;
             }
         }
-       
-        AnimationHandler(inputDirection);   
-    }
-
-    private void AnimationHandler(Vector2 inputDirection)
-    {
-        anim.SetBool("PlayerMoving", playerMoving);
-        anim.SetBool("Attacking", attacking);
-    }
-
-    public void HealthHandler()
-    {
-        if(currentHealth <= 0)
-        {
-            sfx.playerDead.Play();
-            gameObject.SetActive(false);     
-        }
-    }
-
-    public void HurtPlayer(int damage)
-    {
-        currentHealth -= damage;
-
-        // añadir efecto de flash
-
-        sfx.playerHurt.Play();
-    }
-
-    public void SetMaxHealth()
-    {
-        currentHealth = maxHealth;
+        
     }
 
     private void MeleeHandler()
@@ -121,15 +110,35 @@ public class PlayerController : MonoBehaviour {
             sfx.playerAttack.Play();
         }
 
-        if(attackTimeCounter >= 0)
+        if (attackTimeCounter >= 0)
         {
             attackTimeCounter -= Time.deltaTime;
         }
 
-        if(attackTimeCounter <= 0)
+        if (attackTimeCounter <= 0)
         {
             attacking = false;
             anim.SetBool("Attacking", attacking);
+        }
+    }
+
+    private void AnimationHandler()
+    {
+        anim.SetBool("PlayerMoving", playerMoving);
+        anim.SetBool("Attacking", attacking);
+    }
+
+    public void HurtPlayer(int damage)
+    {
+        currentHealth -= damage;
+
+        if (currentHealth <= 0)
+        {
+            sfx.playerDead.Play();
+        }
+        else
+        {
+            sfx.playerHurt.Play();
         }
     }
 
