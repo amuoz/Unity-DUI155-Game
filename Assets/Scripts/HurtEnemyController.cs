@@ -7,12 +7,20 @@ public class HurtEnemyController : MonoBehaviour {
     public int damageToGive;
 
     public GameObject damageBurst;
+    public GameObject damageNumber;
     public Transform hitPoint;
 
-    public GameObject damageNumber;
+    // maximum vertical distance to allow before two objects can no longer interact
+    public int LayerSize;
 
-	// Use this for initialization
-	void Start () {
+    // time the enemy will be stunned for hit variable
+    public float stunTime;
+
+    // allows us to say when the attack will deal damage
+    public int DMGFrame;
+
+    // Use this for initialization
+    void Start () {
 		
 	}
 	
@@ -25,12 +33,19 @@ public class HurtEnemyController : MonoBehaviour {
     {
         if (other.gameObject.tag == "Enemy")
         {
-            other.gameObject.GetComponent<EnemyHealthController>().HurtEnemy(damageToGive);
-            Instantiate(damageBurst, hitPoint.position, hitPoint.rotation);
-            var clone = (GameObject) Instantiate(damageNumber, hitPoint.position, Quaternion.Euler(Vector3.zero));
-            clone.GetComponent<FloatingNumbersController>().damageNumber = damageToGive;
+            int depth = -1 * (int) transform.position.y;
+            EnemyController enemyController = other.gameObject.GetComponent<EnemyController>();
+            PlayerController playerController = FindObjectOfType<PlayerController>();
 
-            other.gameObject.GetComponent<Animator>().SetTrigger("enemyHit");
+            if (Mathf.Abs(depth - enemyController.getDepth()) <= LayerSize && playerController.isAttacking())
+            {
+                enemyController.HurtEnemy(damageToGive, stunTime);
+
+                Instantiate(damageBurst, hitPoint.position, hitPoint.rotation);
+                var clone = (GameObject)Instantiate(damageNumber, hitPoint.position, Quaternion.Euler(Vector3.zero));
+                clone.GetComponent<FloatingNumbersController>().damageNumber = damageToGive;  
+            }
+            
         }
     }
 

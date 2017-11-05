@@ -22,7 +22,6 @@ GameObject:
   - component: {fileID: 212565865463221710}
   - component: {fileID: 58946777001458724}
   - component: {fileID: 95505442490976002}
-  - component: {fileID: 114533037897806360}
   - component: {fileID: 50462893728808250}
   - component: {fileID: 114723331184154274}
   m_Layer: 0
@@ -68,8 +67,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1403618464311866}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 12.44, y: -14.029, z: 0}
-  m_LocalScale: {x: 35.250004, y: 56.73744, z: 2}
+  m_LocalPosition: {x: 2.36, y: -11.196, z: 0}
+  m_LocalScale: {x: 24.579432, y: 39.562378, z: 1.3945775}
   m_Children:
   - {fileID: 4140024866324614}
   m_Father: {fileID: 0}
@@ -127,18 +126,6 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
---- !u!114 &114533037897806360
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1403618464311866}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 18020fab871579244b38fe7c330a84fb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxHealth: 15
 --- !u!114 &114723331184154274
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -150,10 +137,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24eecd2c2f3823942a41e5faa14d14fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 30
+  speed: 5
   timeBetweenMove: 2
   timeToMove: 2
   waitToReload: 2
+  maxHealth: 15
 --- !u!212 &212460367262550990
 SpriteRenderer:
   m_ObjectHideFlags: 1

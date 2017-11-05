@@ -33,6 +33,8 @@ public class PlayerController : MonoBehaviour {
     private SpriteRenderer sprite;
     private SFXController sfx;
 
+    private BattleRegionController battleRegion;
+
     // Use this for initialization
     void Start () {
         anim = GetComponent<Animator>();
@@ -64,7 +66,7 @@ public class PlayerController : MonoBehaviour {
         {
 
             //This will clamp how far up/down/left/right we can go in LOCAL space
-            transform.position = new Vector2(Mathf.Clamp(transform.position.x, -29, 29), Mathf.Clamp(transform.position.y, -14, -5));
+            transform.position = new Vector2(transform.position.x, Mathf.Clamp(transform.position.y, -14, -5));
 
             if (inputDirection.x != 0f || inputDirection.y != 0f)
             {
@@ -91,6 +93,18 @@ public class PlayerController : MonoBehaviour {
             {
                 // al hacer flip sobre la transform original del player nos quedamos con el valor absoluto de X
                 Vector2 movimiento = new Vector2(Mathf.Abs(inputDirection.x), inputDirection.y);
+
+                // restringir movimiento a la region de batalla si esta activa
+                if (battleRegion != null && battleRegion.isActive())
+                {
+                    Vector3 nextPosi = new Vector3((movimiento.x) * currentSpeed * Time.deltaTime, (movimiento.y) * currentSpeed * Time.deltaTime, 0);
+                    if (!battleRegion.region.bounds.Contains(transform.position + nextPosi))
+                    {
+                        Debug.Log("Player restringido en battle region");
+                        movimiento = Vector2.zero;
+                    }
+                }
+                
                 transform.Translate(movimiento * currentSpeed * Time.deltaTime);
                 // depth of the sprite segun valor de Y
                 sprite.sortingOrder = -1* (int) transform.position.y;
@@ -140,6 +154,16 @@ public class PlayerController : MonoBehaviour {
         {
             sfx.playerHurt.Play();
         }
+    }
+
+    public bool isAttacking()
+    {
+        return attacking;
+    }
+
+    public void setBattleRegion(BattleRegionController region)
+    {
+        battleRegion = region;
     }
 
 }

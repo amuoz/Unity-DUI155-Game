@@ -129,7 +129,7 @@ Transform:
   m_GameObject: {fileID: 1193532625454746}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -18.09, y: -10.07, z: 0}
-  m_LocalScale: {x: 15, y: 15, z: 0.6}
+  m_LocalScale: {x: 10, y: 10, z: 0.6}
   m_Children:
   - {fileID: 4851432879023346}
   - {fileID: 4353491328952698}
@@ -265,9 +265,12 @@ MonoBehaviour:
   damageToGive: 5
   damageBurst: {fileID: 1286715486593734, guid: 2ef9f25e416682f4d8ac2e468c23b5e0,
     type: 2}
-  hitPoint: {fileID: 4103553052824752}
   damageNumber: {fileID: 1427132233716110, guid: a61c3abf66f3998429be3f63287f62a6,
     type: 2}
+  hitPoint: {fileID: 4103553052824752}
+  LayerSize: 3
+  stunTime: 10
+  DMGFrame: 0
 --- !u!114 &114321609401141888
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -284,7 +287,6 @@ MonoBehaviour:
   maxHealth: 50
   currentHealth: 0
   attackTime: 0.3
-  timeToReload: 0.5
 --- !u!212 &212464015659013362
 SpriteRenderer:
   m_ObjectHideFlags: 1
