@@ -8,7 +8,7 @@ public class RajoySpeechController : MonoBehaviour {
     // array de sonidos de rajoy
     public AudioSource[] rajoyTracks;
 
-    private SpriteRenderer sprite;
+    private Image sprite;
 
     private PlayerController player;
 
@@ -30,7 +30,7 @@ public class RajoySpeechController : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        sprite = GetComponent<SpriteRenderer>();
+        sprite = GetComponent<Image>();
         player = FindObjectOfType<PlayerController>();
 
         sprite.enabled = false;

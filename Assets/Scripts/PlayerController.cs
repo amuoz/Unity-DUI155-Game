@@ -34,6 +34,7 @@ public class PlayerController : MonoBehaviour {
     private SFXController sfx;
 
     private BattleRegionController battleRegion;
+    private CameraController camara;
 
     // Use this for initialization
     void Start () {
@@ -41,6 +42,8 @@ public class PlayerController : MonoBehaviour {
         myRigidBody = GetComponent<Rigidbody2D>();
         sfx = FindObjectOfType<SFXController>();
         sprite = GetComponent<SpriteRenderer>();
+        camara = FindObjectOfType<CameraController>();
+
 
         currentHealth = maxHealth;
         currentSpeed = speed;
@@ -64,10 +67,6 @@ public class PlayerController : MonoBehaviour {
 
         if (!attacking && !hit)
         {
-
-            //This will clamp how far up/down/left/right we can go in LOCAL space
-            transform.position = new Vector2(transform.position.x, Mathf.Clamp(transform.position.y, -14, -5));
-
             if (inputDirection.x != 0f || inputDirection.y != 0f)
             {
                 playerMoving = true;
@@ -95,20 +94,34 @@ public class PlayerController : MonoBehaviour {
                 Vector2 movimiento = new Vector2(Mathf.Abs(inputDirection.x), inputDirection.y);
 
                 // restringir movimiento a la region de batalla si esta activa
+                /*
                 if (battleRegion != null && battleRegion.isActive())
                 {
-                    Vector3 nextPosi = new Vector3((movimiento.x) * currentSpeed * Time.deltaTime, (movimiento.y) * currentSpeed * Time.deltaTime, 0);
-                    if (!battleRegion.region.bounds.Contains(transform.position + nextPosi))
+                    Vector3 nextMove = new Vector3(inputDirection.x, inputDirection.y, 0);
+                    if (!battleRegion.region.bounds.Contains(transform.position + nextMove))
                     {
-                        Debug.Log("Player restringido en battle region");
                         movimiento = Vector2.zero;
                     }
                 }
+                */
+
+                // restringir movimiento segun la camara
+                Vector3 nextMove = new Vector3(inputDirection.x, inputDirection.y, 0) + transform.position;
+                if (nextMove.x <= camara.leftEdge 
+                    || nextMove.x >= camara.rightEdge 
+                    || nextMove.y <= camara.bottomEdge 
+                    || nextMove.y >= camara.topEdge)
+                {
+                    movimiento = Vector2.zero;
+                }
                 
-                transform.Translate(movimiento * currentSpeed * Time.deltaTime);
+                transform.Translate(movimiento.normalized * currentSpeed * Time.deltaTime);
                 // depth of the sprite segun valor de Y
                 sprite.sortingOrder = -1* (int) transform.position.y;
             }
+            
+            //This will clamp how far up/down/left/right we can go in LOCAL space
+            transform.position = new Vector2(transform.position.x, Mathf.Clamp(transform.position.y, -14, -6));
         }
         
     }
@@ -159,6 +172,11 @@ public class PlayerController : MonoBehaviour {
     public bool isAttacking()
     {
         return attacking;
+    }
+
+    public BattleRegionController getBattleRegion()
+    {
+        return battleRegion;
     }
 
     public void setBattleRegion(BattleRegionController region)

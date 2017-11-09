@@ -7,10 +7,10 @@ public class BattleRegionController : MonoBehaviour {
     private float regionHeight;
     private float regionWidth;
 
-    private float leftEdge;
-    private float rightEdge;
-    private float topEdge;
-    private float bottomEdge;
+    public float leftEdge;
+    public float rightEdge;
+    public float topEdge;
+    public float bottomEdge;
 
     private bool active;
 
@@ -28,7 +28,7 @@ public class BattleRegionController : MonoBehaviour {
         leftEdge = transform.position.x - regionWidth / 2;
         rightEdge = transform.position.x + regionWidth / 2;
         topEdge = transform.position.y + regionHeight / 2;
-        rightEdge = transform.position.y - regionHeight / 2;
+        bottomEdge = transform.position.y - regionHeight / 2;
 
         active = false;
         hasEnemies = false;

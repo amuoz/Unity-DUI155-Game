@@ -8,6 +8,7 @@ public class GameController : MonoBehaviour {
     // referencia al jugador
     private PlayerController player;
 
+
     // scene reload time
     public float timeToReload;
     private float timeToReloadCounter;
